@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY_CREDS = 'dockerhub'
+        DOCKER_REGISTRY_CREDS = 'docker'
         EMAIL_NOTIFICATION = 'ahuraira235@gmail.com'
         DOCKER_BFLASK_IMAGE = 'xsrt123/demoflaskapp' // 
     }
