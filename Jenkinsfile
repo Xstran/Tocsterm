@@ -33,7 +33,7 @@ pipeline {
                         sh "docker rm my-flask-app || true"
 
                         try {
-                            sh "docker run -d -p 5001:5000 --name my-flask-app ${DOCKER_BFLASK_IMAGE}:latest"
+                            sh "docker run -d -p 80:5000 --name my-flask-app ${DOCKER_BFLASK_IMAGE}:latest"
                         } catch (Exception e) {
                             currentBuild.result = 'FAILURE'
                             error("Deployment failed. Rolling back to the previous version.")
