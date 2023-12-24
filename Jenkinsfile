@@ -16,29 +16,23 @@ pipeline {
     stage('Deploy') {
       steps {
         script {
-          // Write a Docker Compose file
-          writeFile file: 'docker-compose.yml', text: """
-          version: '3'
-          services:
-            my-flask-app:
-              image: ${DOCKER_BFLASK_IMAGE}:latest
-              ports:
-                - "5000:5000"
-              container_name: my-flask-app
-          """
+          // Login to Docker registry and push the Docker image
+          withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+            sh "echo \$DOCKER_PASSWORD | docker login -u \$DOCKER_USERNAME --password-stdin docker.io"
+            sh "docker push ${DOCKER_BFLASK_IMAGE}"
+          }
 
-          // Deploy the application using Docker Compose
-          sh 'docker-compose -f docker-compose.yml up -d'
+          // Pull the latest Docker image, stop and remove the existing container, and start a new container
+          sh "docker pull ${DOCKER_BFLASK_IMAGE}:latest"
+          sh "docker stop my-flask-app || true"  // Stop the container if it's running (ignore errors if not found)
+          sh "docker rm my-flask-app || true"    // Remove the container if it exists (ignore errors if not found)
+          sh "docker run -d -p 5001:5000 --name my-flask-app ${DOCKER_BFLASK_IMAGE}:latest"
         }
       }
     }
   }
   post {
     always {
-      script {
-        // Remove the Docker Compose file
-        sh 'rm docker-compose.yml'
-      }
       sh 'docker logout'
     }
   }
