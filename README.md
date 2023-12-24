@@ -1,1 +1,1 @@
-# CI-CD-Jenkins on ec2
+# CI-CD-Jenkins on ec2 terminal
